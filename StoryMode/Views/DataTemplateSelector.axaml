@@ -1,0 +1,22 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:StoryMode.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:DataTemplateSelectorViewModel"
+             x:Class="StoryMode.Views.DataTemplateSelector">
+    <ItemsControl ItemsSource="{Binding DynamicFields}">
+        <ItemsControl.ItemTemplate>
+            <local:FieldTemplateSelector>
+                <DataTemplate DataType="vm:NumberFieldViewModel">
+                    <NumericUpDown Value="{Binding Value}" Label="{Binding Name}"/>
+                </DataTemplate>
+
+                <DataTemplate DataType="vm:TextFieldViewModel">
+                    <TextBox Text="{Binding Value}" Watermark="{Binding Name}"/>
+                </DataTemplate>
+            </local:FieldTemplateSelector>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

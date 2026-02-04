@@ -1,0 +1,20 @@
+﻿[Meta]
+ISO = "en-US"
+Name = "English (US)"
+Version = "0.0.1"
+
+[App]
+AppTitle = "StoryMode"
+
+[Sidebar]
+CodexHeader = "World Codex"
+SearchHint = "Search entries..."
+ToggleSidebar = "Toggle Codex"
+
+[Settings]
+Header = "Settings"
+LanguagePlaceholder = "Select a Language"
+
+[Editor]
+Placeholder = "Once upon a time..."
+WordCount = "Words: {0}"
