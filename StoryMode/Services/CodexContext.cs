@@ -12,6 +12,8 @@ public class CodexContext : DbContext
     public DbSet<FieldDefinition> Fields { get; set; }
     
     public string DbPath { get; private init; }
+    
+    private static string _currentDbPath = string.Empty;
 
     public CodexContext()
     {
@@ -20,9 +22,17 @@ public class CodexContext : DbContext
         DbPath = Path.Combine(folder, "codex.db");
     }
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public static void SetDatabasePath(string path)
     {
-        optionsBuilder.UseSqlite($"Data Source={DbPath}");
+        _currentDbPath = path;
+    }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        // Fallback for design-time or first run
+        options.UseSqlite(string.IsNullOrEmpty(_currentDbPath)
+            ? "Data Source=fallback.db"
+            : $"Data Source={_currentDbPath}");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,6 +62,12 @@ public class CodexContext : DbContext
             // Location Fields
             new FieldDefinition { Id = 4, CodexTypeId = 2, Name = "Region", Key = "region", DataType = FieldDataType.Text },
             new FieldDefinition { Id = 5, CodexTypeId = 2, Name = "Population", Key = "population", DataType = FieldDataType.Number }
+        );
+        
+        // OPTIONAL: Seed some default Tags if you want
+        modelBuilder.Entity<Tag>().HasData(
+            new Tag { Id = 1, Name = "WIP", ColorHex = "#FFD700" }, // Gold
+            new Tag { Id = 2, Name = "Major", ColorHex = "#FF5733" } // Red
         );
     }
 }
