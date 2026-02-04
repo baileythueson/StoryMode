@@ -3,6 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StoryMode.Models;
 
+/// <summary>
+/// Represents a tag used to categorize or label various codex entries in the system.
+/// A tag can include an identifier, name, color code, and associated codex entries.
+/// </summary>
 public class Tag
 {
     [Key]

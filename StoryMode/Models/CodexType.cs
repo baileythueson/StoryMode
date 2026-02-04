@@ -5,6 +5,10 @@ using System.Reflection.Metadata;
 
 namespace StoryMode.Models;
 
+/// <summary>
+/// Represents a classification type for Codex entries, such as "Character" or "Location".
+/// This class defines properties and metadata that categorize and visually represent each Codex entry type.
+/// </summary>
 public class CodexType
 {
     [Key]

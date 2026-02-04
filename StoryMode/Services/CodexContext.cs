@@ -5,6 +5,11 @@ using StoryMode.Models;
 
 namespace StoryMode.Services;
 
+/// <summary>
+/// Represents the application's database context for managing Codex-related entities.
+/// This context is responsible for managing interactions with the underlying SQLite database,
+/// providing DbSet properties for accessing Codex entries, types, and field definitions.
+/// </summary>
 public class CodexContext : DbContext
 {
     public DbSet<CodexEntry> Entries { get; set; }
@@ -21,7 +26,13 @@ public class CodexContext : DbContext
         Directory.CreateDirectory(folder);
         DbPath = Path.Combine(folder, "codex.db");
     }
-    
+
+    /// <summary>
+    /// Sets the path to the database file for the application's database context.
+    /// This method is primarily used to configure the database path dynamically
+    /// during runtime based on specific application needs.
+    /// </summary>
+    /// <param name="path">The complete file system path to the database file.</param>
     public static void SetDatabasePath(string path)
     {
         _currentDbPath = path;
@@ -34,7 +45,7 @@ public class CodexContext : DbContext
             ? "Data Source=fallback.db"
             : $"Data Source={_currentDbPath}");
     }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

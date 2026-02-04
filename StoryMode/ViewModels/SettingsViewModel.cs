@@ -6,6 +6,10 @@ using StoryMode.Services;
 
 namespace StoryMode.ViewModels;
 
+/// <summary>
+/// Represents the ViewModel responsible for managing the settings of the application,
+/// including language preferences.
+/// </summary>
 public partial class SettingsViewModel : ObservableObject
 {
     public ObservableCollection<LanguageOption> Languages => LanguageManager.Instance.AvailableLanguages;

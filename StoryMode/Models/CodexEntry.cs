@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StoryMode.Models;
 
+/// <summary>
+/// Represents an entry in the codex, used to store data about a specific entity, such as a character, object, or location.
+/// </summary>
 public class CodexEntry
 {
     [Key]
