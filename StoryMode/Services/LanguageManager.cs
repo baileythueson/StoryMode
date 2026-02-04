@@ -8,6 +8,10 @@ using Tomlyn.Model;
 
 namespace StoryMode.Services;
 
+/// <summary>
+/// Provides functionality for managing application languages, including loading available languages
+/// and retrieving localized string values from language files.
+/// </summary>
 public partial class LanguageManager : ObservableObject
 {
     public static LanguageManager Instance { get; } = new();
@@ -21,6 +25,15 @@ public partial class LanguageManager : ObservableObject
     
     [ObservableProperty] private LanguageOption? _selectedLanguage;
 
+    /// <summary>
+    /// Initializes the language manager by scanning the designated directory for language files,
+    /// parsing their content, and populating the list of available languages. This method scans
+    /// for TOML files located in the "Assets/Lang" folder relative to the application's base directory.
+    /// </summary>
+    /// <remarks>
+    /// Each valid language file is expected to contain a meta section with "Name" and "ISO" keys.
+    /// If a file cannot be parsed or is missing the required metadata, it will be skipped and logged.
+    /// </remarks>
     public void Initialize()
     {
         var langDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Lang");
@@ -51,7 +64,13 @@ public partial class LanguageManager : ObservableObject
             }
         }
     }
-    
+
+    /// <summary>
+    /// Loads the specified language file based on the given ISO code and updates the current language table.
+    /// This method reads a TOML file from the "Assets/Lang" folder, parses its content, and applies the
+    /// corresponding language data. NotifyPropertyChanged is invoked to update data-bound UI components.
+    /// </summary>
+    /// <param name="isoCode">The ISO code of the language to be loaded. This code determines the specific file to read.</param>
     public void LoadLanguage(string isoCode)
     {
         // For development, you can use absolute paths or 
@@ -67,6 +86,13 @@ public partial class LanguageManager : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Retrieves the localized string value associated with the specified key from the currently loaded language table.
+    /// </summary>
+    /// <param name="key">The key for the localized string, with subkeys separated by periods (e.g., "Category.SubCategory.Key").</param>
+    /// <returns>
+    /// The localized string value corresponding to the specified key if found; otherwise, a string in the format "!key!" indicating the key is missing.
+    /// </returns>
     private string GetValue(string key)
     {
         if (_currentTable == null) return $"!{key}!";

@@ -18,3 +18,6 @@ LanguagePlaceholder = "Select a Language"
 [Editor]
 Placeholder = "Once upon a time..."
 WordCount = "Words: {0}"
+
+[Errors]
+FoundUnsaved = "We found some in-progress sessions. Would you like to open one?"

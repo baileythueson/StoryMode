@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Width="400" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        SystemDecorations="None"
+        x:Class="StoryMode.Views.MessageBox"
+        Title="MessageBox">
+    
+    <Border BorderBrush="#3e3e42" BorderThickness="1">
+        <StackPanel Margin="20" Spacing="20">
+            <TextBlock Name="TitleBlock" FontWeight="Bold" Foreground="#d4d4d4"/>
+            <TextBlock Name="MessageBlock" TextWrapping="Wrap" Foreground="#cccccc"/>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Name="YesButton" Content="Yes" Background="#007acc" Foreground="White"/>
+                <Button Name="NoButton" Content="No" Background="#3e3e42" Foreground="White"/>
+                <Button Name="CancelButton" Content="Cancel" Background="Transparent"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

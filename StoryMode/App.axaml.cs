@@ -9,6 +9,7 @@ using HarfBuzzSharp;
 using StoryMode.Services;
 using StoryMode.ViewModels;
 using StoryMode.Views;
+using MessageBox = StoryMode.Views.MessageBox;
 
 namespace StoryMode;
 
@@ -19,7 +20,7 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override void OnFrameworkInitializationCompleted()
+    public override async void OnFrameworkInitializationCompleted()
     {
         LanguageManager.Instance.Initialize(); // Scan TOML files in Assets/Lang
         SettingsService.Instance.Load();       // Load settings from file
@@ -32,10 +33,31 @@ public partial class App : Application
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-            desktop.MainWindow = new MainWindow
+            var window = new MainWindow()
             {
                 DataContext = new MainWindowViewModel(),
             };
+            desktop.MainWindow = window;
+
+            var recoveryService = new RecoveryService();
+            var ghosts = recoveryService.ScanForCrashes();
+            
+            if (ghosts.Count > 0)
+            {
+                var recent = ghosts.OrderByDescending(x => x.LastWriteTime).First();
+                
+                if (await DialogService.ConfirmAsync(
+                        $"Found a crash from {recent.LastWriteTime:yyyy-MM-dd HH:mm:ss}. Do you want to recover?",
+                        "Crash Recovery",
+                        window))
+                {
+                    ProjectManager.Instance.LoadFromRecoveredFolder(recent.Path);
+                }
+                else
+                {
+                    recoveryService.CleanUp(recent.Path, true);
+                }
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
