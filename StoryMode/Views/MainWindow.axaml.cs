@@ -16,7 +16,7 @@ public partial class MainWindow : Window
 
     private async void OnClosing(object sender, WindowClosingEventArgs e)
     {
-        if (ProjectManager.Instance.IsDirty)
+        if (ProjectService.Instance.IsDirty)
         {
             e.Cancel = true;
             

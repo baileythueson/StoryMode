@@ -8,6 +8,7 @@ AppTitle = "StoryMode"
 
 [Sidebar]
 CodexHeader = "World Codex"
+SettingsHeader = "Settings"
 SearchHint = "Search entries..."
 ToggleSidebar = "Toggle Codex"
 
@@ -19,5 +20,13 @@ LanguagePlaceholder = "Select a Language"
 Placeholder = "Once upon a time..."
 WordCount = "Words: {0}"
 
-[Errors]
+[Session]
+FoundTitle = "We found an existing session."
+FoundMessage = "Saved project last written to {0}, found session last written to {1}. Would you like to restore the found session or discard it (open file)?"
+
+[Error]
+SessionInUseTitle = "Existing Session Found"
+SessionInUseMessage = "Another process or application is using this file."
+CorruptSessionTitle = "Corrupt Session Found."
 FoundUnsaved = "We found some in-progress sessions. Would you like to open one?"
+FileNotFound = "File could not be found at path: {0}"

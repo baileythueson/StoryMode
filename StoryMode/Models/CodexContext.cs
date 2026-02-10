@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
-using StoryMode.Models;
 
-namespace StoryMode.Services;
+namespace StoryMode.Models;
 
 /// <summary>
 /// Represents the application's database context for managing Codex-related entities.

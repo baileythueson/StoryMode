@@ -4,12 +4,20 @@ using StoryMode.Models;
 namespace StoryMode.Services;
 
 /// <summary>
-/// Provides services for managing Codex entries, enabling creation and storage of entries
-/// within the application's database. This service interacts with the database context
-/// to persist data, and notifies the project manager when changes occur.
+/// Provides services to manage Codex entries within the application context.
+/// This class handles operations such as adding new entries and updating the project state
+/// to reflect these changes. It utilizes a database context for data persistence and ensures
+/// project metadata consistency by marking the project as modified upon updates.
 /// </summary>
 public class CodexService
 {
+    private readonly ProjectService _projectService;
+
+    public CodexService(ProjectService projectService)
+    {
+        _projectService = projectService;
+    }
+
     /// <summary>
     /// Asynchronously adds a new codex entry to the database and marks the project as modified.
     /// </summary>
@@ -21,6 +29,6 @@ public class CodexService
         db.Entries.Add(entry);
         await db.SaveChangesAsync();
         
-        ProjectManager.Instance.MarkDirty();
+        _projectService.MarkDirty();
     }
 }

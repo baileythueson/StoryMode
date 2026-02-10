@@ -9,8 +9,8 @@
              x:DataType="vm:SettingsViewModel"
              x:Class="StoryMode.Views.SettingsView">
     <StackPanel Margin="20" Spacing="10">
-        <TextBlock Text="{Binding [Settings.SettingsHeader], Source={x:Static services:LanguageManager.Instance}}" Classes="Header"/>
-        <ComboBox PlaceholderText="{Binding [Settings.LanguagePlaceholder], Source={x:Static services:LanguageManager.Instance}}"
+        <TextBlock Text="{Binding [Settings.SettingsHeader], Source={x:Static services:LanguageService.Instance}}" Classes="Header"/>
+        <ComboBox PlaceholderText="{Binding [Settings.LanguagePlaceholder], Source={x:Static services:LanguageService.Instance}}"
                   ItemsSource="{Binding Languages}"
                   SelectedItem="{Binding SelectedLanguage}"
                   DisplayMemberBinding="DisplayName"

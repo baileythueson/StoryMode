@@ -6,6 +6,7 @@
         <entry key="StoryMode/App.axaml" value="StoryMode/StoryMode.csproj" />
         <entry key="StoryMode/ViewModels/MessageBox.axaml" value="StoryMode/StoryMode.csproj" />
         <entry key="StoryMode/Views/AlertBox.axaml" value="StoryMode/StoryMode.csproj" />
+        <entry key="StoryMode/Views/Application.Resources.axaml" value="StoryMode/StoryMode.csproj" />
         <entry key="StoryMode/Views/DataTemplateSelector.axaml" value="StoryMode/StoryMode.csproj" />
         <entry key="StoryMode/Views/EditorView.axaml" value="StoryMode/StoryMode.csproj" />
         <entry key="StoryMode/Views/MainWindow.axaml" value="StoryMode/StoryMode.csproj" />

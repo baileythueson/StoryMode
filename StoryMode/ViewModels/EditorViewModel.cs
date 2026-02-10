@@ -17,7 +17,7 @@ public class EditorViewModel : ViewModelBase
         {
             if (SetProperty(ref _content, value))
             {
-                ProjectManager.Instance.MarkDirty();
+                ProjectService.Instance.MarkDirty();
             }
         }
     }

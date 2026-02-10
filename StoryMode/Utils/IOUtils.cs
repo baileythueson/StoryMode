@@ -9,6 +9,43 @@ namespace StoryMode.Utils;
 public static class IOUtils
 {
     /// <summary>
+    /// Determines whether the specified path is both valid and exists as a directory or file.
+    /// </summary>
+    /// <param name="path">The full path to validate and check for existence.</param>
+    /// <returns>
+    /// True if the path is valid and exists as a file or directory;
+    /// otherwise, false if the path is invalid or does not exist.
+    /// </returns>
+    public static bool IsValidPathExists(string path) => IsValidPath(path) && Directory.Exists(path);
+
+    /// <summary>
+    /// Determines whether the specified path is a valid file or directory path.
+    /// </summary>
+    /// <param name="path">The full path to validate.</param>
+    /// <returns>
+    /// True if the path is valid and meets the criteria for a file or directory;
+    /// otherwise, false if the path is invalid, points to an unsupported type, or checks fail.
+    /// </returns>
+    public static bool IsValidPath(string path)
+    {
+        var isFile = false;
+        // check if path has extension
+        if (Path.HasExtension(path)) isFile = true;
+        // exclude .d (directory) files
+        if(path.EndsWith(".d", StringComparison.OrdinalIgnoreCase)) isFile = false;
+        
+        // check if path exists
+        var exists = isFile ? File.Exists(path) : Directory.Exists(path);
+        var result = Touch(path);
+        if (exists) return result; // file already exists
+        
+        // clean up created file
+        if (isFile) RmFileExists(path);
+        else RmDirectoryExists(path);
+        return result;
+    }
+    
+    /// <summary>
     /// Deletes the specified file or directory if it exists and is empty.
     /// </summary>
     /// <param name="path">The full path of the file or directory to check and delete if empty.</param>
@@ -45,7 +82,35 @@ public static class IOUtils
         if (!File.Exists(path)) return;
         if (new FileInfo(path).Length == 0) File.Delete(path);
     }
-    
+
+    /// <summary>
+    /// Determines whether the specified directory is empty.
+    /// </summary>
+    /// <param name="path">The full path of the directory to check.</param>
+    /// <returns>
+    /// True if the directory does not exist or contains no files or subdirectories;
+    /// otherwise, false if the directory contains content.
+    /// </returns>
+    public static bool IsDirectoryEmpty(string path)
+    {
+        if (!Directory.Exists(path)) return true;
+        return Directory.GetFileSystemEntries(path).Length == 0;
+    }
+
+    /// <summary>
+    /// Determines whether the specified file is empty.
+    /// </summary>
+    /// <param name="path">The full path of the file to check.</param>
+    /// <returns>
+    /// True if the file has a size of 0 bytes or does not exist;
+    /// otherwise, false if the file contains data.
+    /// </returns>
+    public static bool IsFileEmpty(string path)
+    {
+        if (!File.Exists(path)) return true;
+        return new FileInfo(path).Length == 0;
+    }
+
     /// <summary>
     /// Deletes the directory at the specified path if it exists.
     /// </summary>
@@ -77,9 +142,10 @@ public static class IOUtils
     /// <returns>True if the last write time was successfully updated; otherwise, false.</returns>
     public static bool Touch(string path)
     {
+        if (!File.Exists(path)) File.Create(path).Close();
         try
         {
-            File.SetLastWriteTimeUtc(path, DateTime.UtcNow);
+            File.SetLastAccessTimeUtc(path, DateTime.UtcNow);
             return true;
         }
         catch (IOException)

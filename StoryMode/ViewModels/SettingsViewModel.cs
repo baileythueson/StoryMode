@@ -12,7 +12,7 @@ namespace StoryMode.ViewModels;
 /// </summary>
 public partial class SettingsViewModel : ObservableObject
 {
-    public ObservableCollection<LanguageOption> Languages => LanguageManager.Instance.AvailableLanguages;
+    public ObservableCollection<LanguageOption> Languages => LanguageService.Instance.AvailableLanguages;
 
     public LanguageOption? CurrentLanguage => _selectedLanguage;
     
@@ -25,7 +25,7 @@ public partial class SettingsViewModel : ObservableObject
             if (SetProperty(ref _selectedLanguage, value) && value != null)
             {
                 // Change live language
-                LanguageManager.Instance.LoadLanguage(value.IsoCode);
+                LanguageService.Instance.LoadLanguage(value.IsoCode);
                 
                 // update persisted settings
                 SettingsService.Instance.CurrentSettings.Language = value.IsoCode;

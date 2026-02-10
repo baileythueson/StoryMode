@@ -1,59 +1,93 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 using StoryMode.Utils;
 
 namespace StoryMode.Services;
 
 /// <summary>
-/// Provides functionality to scan for crash recovery sessions and manage their recovery or cleanup.
-/// The service identifies potential crash data in a designated temporary directory and processes recovery sessions.
+/// Responsible for diagnosing and repairing invalid or abandoned sessions.
 /// </summary>
 public class RecoveryService
 {
-    private readonly string _rootTempPath = Path.Combine(Path.GetTempPath(), "StoryMode");
+    private readonly ILogger<RecoveryService> _logger;
+    private readonly DialogService _dialogService;
+    private readonly LanguageService _language;
+    private readonly WorkspaceService _workspaceService; // Needs muscle to fix things
+
+    public RecoveryService(
+        ILogger<RecoveryService> logger, 
+        DialogService dialogService, 
+        LanguageService language,
+        WorkspaceService workspaceService)
+    {
+        _logger = logger;
+        _dialogService = dialogService;
+        _language = language;
+        _workspaceService = workspaceService;
+    }
 
     /// <summary>
-    /// Scans for crash recovery sessions within the designated temporary directory and attempts to identify
-    /// potential crash data based on the presence of specific files. If a recovery session is found, it is added
-    /// to the result set. Empty directories are cleaned up during the scan.
+    /// Attempts to recover an existing, abandoned workspace.
+    /// Returns TRUE if recovered, FALSE if the user chose to discard (or if it was corrupt).
     /// </summary>
-    /// <returns>
-    /// A list of <see cref="RecoverySession"/> objects representing the identified crash recovery sessions.
-    /// Returns an empty list if no sessions are found or the temporary directory does not exist.
-    /// </returns>
-    public List<RecoverySession> ScanForCrashes()
+    public async Task<bool> TryRecoverAsync(string projectFilePath, string workspacePath)
     {
-        var crashes = new List<RecoverySession>();
-        if (!Directory.Exists(_rootTempPath)) return crashes;
-        
-        var dirs = Directory.GetDirectories(_rootTempPath);
+        _logger.LogInformation("Attempting recovery for {Path}", workspacePath);
 
-        foreach (var dir in dirs)
+        // 1. Diagnose Database
+        var dbPath = Path.Combine(workspacePath, "codex.db");
+        if (!IsDatabaseIntact(dbPath))
         {
-            var info = new DirectoryInfo(dir);
+            _logger.LogWarning("Database corrupted. Cannot recover.");
+            await _dialogService.AlertAsync(
+                _language["Error.LoadTitle"], 
+                "The previous session was corrupted and cannot be restored.", 
+                AvaloniaUtils.GetActiveWindow());
             
-            var lockFile = Path.Combine(dir, ".lock");
-            var dbFile = Path.Combine(dir, "codex.db");
-
-            if (File.Exists(lockFile))
-            {
-                if (IOUtils.IsFileLocked(lockFile)) continue;
-                crashes.Add(new RecoverySession(dir, info.LastWriteTime));
-            }
-            else if (File.Exists(dbFile))
-            {
-                crashes.Add(new RecoverySession(dir, info.LastWriteTime));
-            }
-            else
-            {
-                // delete empty folders
-                IOUtils.DeleteIfEmpty(dir);
-            }
+            // We failed to recover, so we clean up and return false
+            return false;
         }
-        
-        return crashes;
+
+        // 2. Ask User
+        var fileInfo = new FileInfo(projectFilePath);
+        var dirInfo = new DirectoryInfo(workspacePath);
+
+        var restore = await _dialogService.ChoiceAsync(
+            _language["Session.FoundTitle"],
+            string.Format(_language["Session.FoundMessage"], fileInfo.LastWriteTime, dirInfo.LastWriteTime),
+            _language["Session.Restore"], 
+            _language["Session.Discard"], 
+            AvaloniaUtils.GetActiveWindow()
+        );
+
+        if (restore)
+        {
+            IOUtils.Touch(Path.Combine(workspacePath, ".lock")); // Claim lock
+            return true;
+        }
+
+        return false;
     }
-    
-    public record RecoverySession(string Path, DateTime LastWriteTime);
+
+    private bool IsDatabaseIntact(string databasePath)
+    {
+        if (!File.Exists(databasePath)) return false;
+        try
+        {
+            var builder = new SqliteConnectionStringBuilder
+            {
+                DataSource = databasePath,
+                Mode = SqliteOpenMode.ReadOnly
+            };
+            using var connection = new SqliteConnection(builder.ToString());
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "PRAGMA integrity_check;";
+            return command.ExecuteScalar()?.ToString() == "ok";
+        }
+        catch { return false; }
+    }
 }
