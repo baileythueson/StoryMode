@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using StoryMode.Models;
+using StoryMode.Core.Models;
 
 namespace StoryMode.API.Controllers;
 
